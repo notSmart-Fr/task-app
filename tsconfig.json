@@ -15,7 +15,11 @@
     "incremental": true,
     "plugins": [
       {
-        "name": "next"
+        "name": "next",
+        "enableTsPlugin": true
+      },
+      {
+        "name": "@effect/tsgo"
       }
     ],
     "paths": {
