@@ -46,13 +46,14 @@ const app = HttpApiBuilder.httpApp.pipe(
         return Effect.failCause(cause);
       }),
       // Catch every remaining failure (typed errors and defects), log the real
-      // cause, and return a meaningful response instead of an empty 500.
+      // cause as structured output, and return a meaningful response instead of
+      // an empty 500.
       Effect.catchAllCause((cause) =>
         Effect.gen(function*() {
-          yield* Effect.logError(`Request failed: ${Cause.pretty(cause)}`);
-          return HttpServerResponse.text(
-            JSON.stringify({ error: "internal", message: "Internal Server Error" }),
-            { status: 500, contentType: "application/json" }
+          yield* Effect.logError("Unhandled server error", cause);
+          return yield* HttpServerResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
           );
         })
       )
