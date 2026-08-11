@@ -1,0 +1,10 @@
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+
+export const tasks = sqliteTable("tasks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  done: integer("done", { mode: "boolean" }).notNull().default(false),
+});
+
+export type TaskSelect = typeof tasks.$inferSelect;
+export type TaskInsert = typeof tasks.$inferInsert;

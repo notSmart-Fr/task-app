@@ -290,6 +290,89 @@ const UserRepoLive = Layer.succeed(UserRepo, {
 - The runtime wiring is composable and can be replaced per environment.
 - It matches the way Effect code in this repository is structured around services and layers.
 
+## 8. HttpApi / HttpApp route handlers: common wiring mistakes
+
+Route handlers in the app router are a frequent source of friction. The following mistakes have been hit in this repository and should be avoided.
+
+### Name the file `route.ts`, not `routes.ts`
+
+Next.js App Router only treats a file named `route.ts` inside a route segment as a route handler. A file named `routes.ts` is silently ignored and the server returns a 404.
+
+```text
+// ❌ Wrong - Next.js ignores this
+src/app/api/[[...route]]/routes.ts
+
+// ✅ Correct - Next.js treats this as the route handler
+src/app/api/[[...route]]/route.ts
+```
+
+### Read the request from the HttpServerRequest tag, not Effect.service
+
+The `HttpServerRequest` context tag is itself directly yieldable. Do not use `Effect.service(...)` — it does not exist in current Effect versions and produces a type error.
+
+```ts
+// ❌ Wrong - Effect.service does not exist
+const request = yield* Effect.service(HttpServerRequest.HttpServerRequest)
+
+// ✅ Correct - yield the tag directly
+const request = yield* HttpServerRequest.HttpServerRequest
+```
+
+### Do not hard-code a single response for every route
+
+A catch-all handler should route on the request path rather than returning the same payload for every URL.
+
+```ts
+import { HttpApp, HttpServerRequest, HttpServerResponse } from "@effect/platform"
+import { Effect } from "effect"
+
+const app: HttpApp.Default = Effect.gen(function*() {
+  const request = yield* HttpServerRequest.HttpServerRequest
+  const path = new URL(request.url).pathname
+
+  if (path === "/api/info") {
+    return HttpServerResponse.text(JSON.stringify({ status: "info", route: path }), {
+      status: 200,
+      contentType: "application/json"
+    })
+  }
+
+  return HttpServerResponse.text(JSON.stringify({ status: "ok", route: path }), {
+    status: 200,
+    contentType: "application/json"
+  })
+})
+
+const handler = HttpApp.toWebHandler(app)
+
+export const GET = handler
+export const POST = handler
+export const PUT = handler
+export const DELETE = handler
+```
+
+### Build responses with the HttpServerResponse constructors
+
+Do not mutate responses with methods that do not exist on `HttpServerResponse`. Use the constructor helpers such as `text`, `json`, `uint8Array`, and `empty`.
+
+```ts
+// ❌ Wrong - withBody does not exist on HttpServerResponse
+HttpServerResponse.empty({ status: 200 }).withBody(...)
+
+// ✅ Correct - use a constructor
+HttpServerResponse.text(JSON.stringify({ status: "ok" }), {
+  status: 200,
+  contentType: "application/json"
+})
+```
+
+### Summary of route-handler rules
+
+- Name the handler file `route.ts`.
+- Yield `HttpServerRequest.HttpServerRequest` directly to read the request.
+- Route on the request path instead of returning a fixed response.
+- Build responses with `HttpServerResponse` constructors, not ad-hoc mutation.
+
 ## Summary
 
 The short version is:
