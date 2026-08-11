@@ -1,6 +1,6 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import * as schema from "@/features/tasks/db/schema";
+import * as schema from "@/lib/db/schema";
 
 const sqliteClient = createClient({
   url: "file:tasks.db",
