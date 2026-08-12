@@ -7,10 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:oxlint": "oxlint . --config ./oxlint.json",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "prepare": "effect-tsgo patch --typescript --no-oxlint"
+    "prepare": "effect-tsgo patch --typescript --oxlint"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -42,6 +43,8 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "oxlint": "1.77.0",
+    "oxlint-tsgolint": "7.0.2001",
     "tailwindcss": "^4",
     "typescript": "npm:typescript@^6.0.0"
   },
