@@ -1,5 +1,5 @@
 {
-  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.path": "node_modules/@typescript/native",
   "js/ts.preferences.autoImportFileExcludePatterns": ["repos/**"],
   "files.exclude": {
     "repos/**": true
@@ -9,5 +9,8 @@
   },
   "search.exclude": {
     "repos/**": true
-  }
+  },
+  "js/ts.tsdk.additionalLocations": ["./node_modules/@typescript/native"],
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.experimental.useTsgo": true
 }

@@ -12,7 +12,6 @@ const eslintConfig = defineConfig([
     },
     rules: {
       // Add specific Effect rules here if desired
-      "@effect/durable-deferred": "error",
     },
   },
   // Override default ignores of eslint-config-next.
@@ -22,6 +21,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored repo (mirrored in .vscode/settings.json excludes):
+    "repos/**",
   ]),
 ]);
 
