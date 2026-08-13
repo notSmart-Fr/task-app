@@ -1,7 +1,7 @@
 # Effect v4 migration notes (task-app)
 
 Target = vendored `repos/effect` (`4.0.0-beta.107`). App migrated from effect 3.22 +
-`@effect/platform` 0.97 + drizzle to effect v4 + `@effect/sql-libsql` (drizzle removed, bun used).
+`@effect/platform` 0.97 + drizzle to effect v4 + `@effect/sql-libsql` (drizzle removed, pnpm + node used).
 
 ## Key version facts
 
@@ -34,16 +34,15 @@ Target = vendored `repos/effect` (`4.0.0-beta.107`). App migrated from effect 3.
    typing.
 6. `next build` must run from the project dir; via a `cmd /c` subshell Turbopack static-gen
    intermittently fails with `Expected workStore to be initialized` on default pages (unrelated to
-   code). Run `bunx next build` directly from the project root.
+   code). Run `pnpm build` (next build) directly from the project root.
 7. ESLint in this repo bans `.flatMap()` and `Context.Tag()`/`GenericTag()` — use
    `Effect.gen`/`Effect.map`/`Effect.andThen` and `Context.Service`.
 8. Vendored `repos/effect` must be excluded from the app tsconfig
    (`"exclude": ["node_modules", "repos"]`) or `next build` type-checks it (its own deps aren't
    installed).
-9. bun on Windows: imports with `..`/extensionless sometimes fail in standalone scripts; the `@/`
-   alias (tsconfig paths) works under `bun run`. Also `bunx tsc6` is unreliable — use
-   `node node_modules/typescript/bin/tsc --noEmit` for authoritative checks; `next build` is the
-   final arbiter.
+9. Package manager is pnpm (bun dropped due to Windows bugs). Standalone TS scripts run via `tsx`
+   (`pnpm db:migrate`). For authoritative type checks use
+   `node node_modules/typescript/bin/tsc --noEmit`; `next build` is the final arbiter.
 
 ## Oxlint + tsgo setup (task-app)
 
@@ -70,7 +69,7 @@ Target = vendored `repos/effect` (`4.0.0-beta.107`). App migrated from effect 3.
 ## Structure (verified working)
 
 - `src/lib/db/migrations.ts` (Migrator.fromRecord, inline migrations) + `client.ts` (DbLive) +
-  `migrate.ts` (`bun run src/lib/db/migrate.ts`).
+  `migrate.ts` (`pnpm db:migrate` via tsx).
 - `src/api/index.ts` composes groups: `HttpApi.make("root").add(SystemGroup).add(TasksGroup)`.
 - `src/features/tasks/{schema,routes,service,handlers,index}.ts` — see
   `.knowledge/agent-patterns/effect-core.md` sections 8.x.

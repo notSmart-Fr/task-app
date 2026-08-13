@@ -1,7 +1,7 @@
 import { Effect, Layer } from "effect"
 import { DbLive } from "./client"
 
-// Standalone migration runner: `bun run src/lib/db/migrate.ts`.
+// Standalone migration runner: `pnpm db:migrate` (tsx executes this file).
 // Building DbLive runs any pending migrations (see lib/db/migrations.ts).
 const program = Effect.scoped(
   Effect.gen(function*() {

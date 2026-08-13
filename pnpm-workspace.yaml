@@ -1,0 +1,7 @@
+# Dependencies allowed to run postinstall/build scripts.
+# esbuild is required by tsx; unrs-resolver is required by
+# eslint-import-resolver-typescript; msgpackr-extract ships a native module.
+allowBuilds:
+  esbuild: true
+  msgpackr-extract: true
+  unrs-resolver: true

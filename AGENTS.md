@@ -53,7 +53,7 @@ Recommended pattern for Next.js + Effect + Effect SQL (no ORM):
 - src/lib/db/: shared persistence infrastructure
   - migrations.ts: inline Effect SQL migrations (Migrator.fromRecord)
   - client.ts: DbLive layer (LibsqlClient.layer + migrations)
-  - migrate.ts: standalone migration runner (`bun run src/lib/db/migrate.ts`)
+  - migrate.ts: standalone migration runner (`pnpm db:migrate`)
 - src/features/<feature>/: feature-owned code
   - index.ts: public barrel for the feature
   - schema.ts: request/response schemas and typed errors
@@ -80,8 +80,8 @@ Validation:
 
 | Change type | Checks |
 | --- | --- |
-| Effect / API code | `bun run lint`, `bun run lint:oxlint`, `node node_modules/typescript/bin/tsc --noEmit`, `bunx next build` |
-| DB / migrations | `bun run db:migrate` |
+| Effect / API code | `pnpm lint`, `pnpm lint:oxlint`, `node node_modules/typescript/bin/tsc --noEmit`, `pnpm build` |
+| DB / migrations | `pnpm db:migrate` |
 | Docs / knowledge only | none (unless code changed) |
 
 ## 8. Do not assume missing context
