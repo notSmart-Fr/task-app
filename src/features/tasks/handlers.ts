@@ -19,6 +19,7 @@ export const TasksHandlersLive = HttpApiBuilder.group(
       .handle("createTask", ({ payload }) => repo.create(payload))
       .handle("updateTask", ({ params, payload }) => repo.update(params.id, payload))
       .handle("deleteTask", ({ params }) => repo.remove(params.id))
+      .handle("searchTasks", ({ query }) => repo.search(query.id, query.title, query.done))
   })
 ).pipe(
   Layer.provide(TasksRepoLive)

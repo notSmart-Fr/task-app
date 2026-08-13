@@ -6,7 +6,7 @@ import {
   HttpServerError,
   HttpServerResponse
 } from "effect/unstable/http"
-import { HttpApiBuilder } from "effect/unstable/httpapi"
+import { HttpApiBuilder, HttpApiSwagger } from "effect/unstable/httpapi"
 import { RootApi } from "@/api"
 import { SystemHandlersLive } from "@/api/service"
 import { TasksHandlersLive } from "@/features/tasks/handlers"
@@ -16,14 +16,16 @@ import { DbLive } from "@/lib/db/client"
 // a Web handler for Next.js. HttpApiBuilder.layer registers every group on an
 // HttpRouter; HttpRouter.toHttpEffect exposes the router as an Effect so we can
 // add global error handling before converting it with HttpEffect.toWebHandler.
-//
 // The handler/repo layers provide their own dependencies (TasksRepo, SqlClient)
 // internally, and are merged here so the resulting app layer is fully
 // self-contained with no per-request service requirements.
+//swagger router
+const swaggerLive=HttpApiSwagger.layer(RootApi,{path: "/api/docs"})
 const AppLive = HttpApiBuilder.layer(RootApi).pipe(
   Layer.provideMerge(SystemHandlersLive),
   Layer.provideMerge(TasksHandlersLive),
-  Layer.provideMerge(DbLive)
+  Layer.provideMerge(DbLive),
+  Layer.provideMerge(swaggerLive)
 )
 
 // Global error handling. v4's router already maps failures to responses (missing
