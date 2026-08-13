@@ -1,36 +1,30 @@
-<!-- Use a static Shields badge because pkg.pr.new's dynamic badge times out while counting this repository's releases. -->
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-[![pkg.pr.new](https://img.shields.io/badge/pkg.pr.new-Effect--TS%2Feffect-black)](https://pkg.pr.new/~/Effect-TS/effect)
+## Getting Started
 
-# Effect
+First, run the development server:
 
-Effect is a library for building robust, maintainable, type-safe, and production grade applications in TypeScript.
-
-> **Effect V4 is currently in beta.** The `main` branch contains v4 development.
-
-## Install V4 Beta
-
-```sh
-npm install effect@beta
+```bash
+pnpm dev
 ```
 
-## Effect v3
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The Effect v3 source code is available on the [`v3`](https://github.com/Effect-TS/effect/tree/v3) branch.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```sh
-npm install effect@latest
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Issues and pull requests meant for Effect v3 should target the [`v3`](https://github.com/Effect-TS/effect/tree/v3) branch.
+## Learn More
 
-## Resources
+To learn more about Next.js, take a look at the following resources:
 
-- Documentation (https://effect.website)
-- Discord (https://discord.gg/effect-ts)
-- Effect v3 source (https://github.com/Effect-TS/effect/tree/v3)
-- Effect v4 source (https://github.com/Effect-TS/effect/tree/main)
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## License
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-MIT
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

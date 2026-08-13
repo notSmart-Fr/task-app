@@ -1,8 +1,48 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "include": [],
-  "references": [
-    { "path": "tsconfig.packages.json" },
-    { "path": "tsconfig.tests.json" }
+  "$schema": "./node_modules/@effect/tsgo/schema.json",
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "ignoreDeprecations": "6.0",
+    "plugins": [
+      {
+        "name": "next",
+        "enableTsPlugin": true
+      },
+      {
+        "name": "@effect/language-service",
+        "diagnostics": false,
+        "allowedDuplicatedPackages": [
+          "effect",
+          "@effect/sql-libsql"
+        ]
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": [
+    "node_modules",
+    "repos"
   ]
 }
