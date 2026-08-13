@@ -1,4 +1,5 @@
-import { HttpApi } from "@effect/platform";
-import { SystemGroup } from "./routes";
+import { HttpApi } from "effect/unstable/httpapi"
+import { TasksGroup } from "@/features/tasks/routes"
+import { SystemGroup } from "./routes"
 
-export const RootApi = HttpApi.make("root").add(SystemGroup);
+export const RootApi = HttpApi.make("root").add(SystemGroup).add(TasksGroup)

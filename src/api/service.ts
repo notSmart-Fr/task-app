@@ -1,26 +1,22 @@
-import { HttpApiBuilder } from "@effect/platform";
-import { Effect, Layer } from "effect";
-import { RootApi } from "./index";
+import { Effect } from "effect"
+import { HttpApiBuilder } from "effect/unstable/httpapi"
+import { RootApi } from "./index"
+import { HealthResponse, RootInfoResponse } from "./schema"
 
-// Handler implementation for the "api" group
-export const SystemHandlerLive = HttpApiBuilder.group(
+// Handler implementation for the "api" group.
+export const SystemHandlersLive = HttpApiBuilder.group(
   RootApi,
   "api",
-  (builder) =>
-    builder
+  (handlers) =>
+    handlers
       .handle("info", () =>
-        Effect.succeed({
-          name: "Task App",
-          version: "1.0.0",
-          endpoints: ["/api/info", "/api/health"],
-        })
+        Effect.succeed(
+          new RootInfoResponse({
+            name: "Task App",
+            version: "1.0.0",
+            endpoints: ["/api/info", "/api/health"]
+          })
+        )
       )
-      .handle("health", () =>
-        Effect.succeed({ status: "ok" as const })
-      )
-);
-
-// Combined Root Service Layer
-export const AppServiceLive = HttpApiBuilder.api(RootApi).pipe(
-  Layer.provide(SystemHandlerLive)
-);
+      .handle("health", () => Effect.succeed(new HealthResponse({ status: "ok" })))
+)

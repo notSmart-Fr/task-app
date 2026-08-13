@@ -14,8 +14,10 @@ Last verified: 2026-08-12
 "typescript": "npm:typescript@^6.0.0",        // real TS6 JS API for typescript-eslint / next build
 "@typescript/native": "npm:typescript@^7.0.2", // native TS7 for editor LSP + tsc bin
 "@effect/tsgo": "0.36.4",
+"oxlint": "1.77.0",                          // must match the version @effect/tsgo supports (see below)
+"oxlint-tsgolint": "7.0.2001",
 // scripts:
-"prepare": "effect-tsgo patch --typescript --no-oxlint"
+"prepare": "effect-tsgo patch --typescript --oxlint"   // patches both TypeScript and oxlint
 ```
 
 ### `.vscode/settings.json`
@@ -71,9 +73,94 @@ Editor: reload window → open a `.ts` file → status bar should show native ts
 
 ---
 
+## Oxlint + Effect tsgo (type-aware Effect linting)
+
+Optional but recommended: `oxlint` (Rust, fast) patched by `@effect/tsgo` so it runs the **type-aware** `effecttsgo` rules — e.g. it flags `Effect.flatMap` → `Effect.succeed` when `Effect.map` suffices, `console.error` instead of `Effect.logError`, v3 APIs used in a v4 project, and `any`/`unknown` in the error channel.
+
+Last verified: 2026-08-13
+
+### Working config
+
+`package.json` devDependencies — versions **must match** `@effect/tsgo`:
+
+```jsonc
+"@effect/tsgo": "0.36.4",           // latest
+"oxlint": "1.77.0",                 // the version @effect/tsgo 0.36.4 ships the patched binary for
+"oxlint-tsgolint": "7.0.2001",      // matching TypeScript-Go integration
+// scripts:
+"prepare": "effect-tsgo patch --typescript --oxlint",   // patch BOTH TS and oxlint
+"lint:oxlint": "oxlint . --config ./oxlint.json"
+```
+
+`oxlint.json` (schema + preset shipped with `@effect/tsgo`):
+
+```jsonc
+{
+  "$schema": "./node_modules/@effect/tsgo/oxlint-schema.json",
+  "extends": ["./node_modules/@effect/tsgo/oxlint-presets/recommended.json"],
+  "ignorePatterns": ["repos/**", ".next/**", "out/**", "build/**", "node_modules/**"]
+}
+```
+
+`tsconfig.json` — set `diagnostics: false` on the `@effect/language-service` plugin so Effect
+diagnostics are reported **only** by oxlint (avoids double-reporting in the editor):
+
+```jsonc
+{ "name": "@effect/language-service", "diagnostics": false, "allowedDuplicatedPackages": ["effect", "@effect/platform-bun", "@effect/platform-node-shared", "@effect/sql-libsql"] }
+```
+
+### Version matching (critical)
+
+`@effect/tsgo` ships the patched `oxlint` binary for **one** specific `oxlint` version. Do **not**
+run `bun add oxlint` (or `bun add @effect/tsgo`) without a version — it pulls the latest `oxlint`
+(e.g. 1.78.0) which the installed tsgo cannot patch, and `prepare` fails with:
+
+```
+ReplacementUnavailableError: Missing packaged artifact .../artifacts/oxlint/1.78.0/oxlint.win32-x64-msvc.node
+```
+
+Fix: reinstall so the lockfile matches the pinned `oxlint` version (`bun install`). To upgrade, upgrade
+`@effect/tsgo` first and let it dictate the matching `oxlint` / `oxlint-tsgolint` versions.
+
+### Oxlint vs ESLint — keep both, they are not equivalent
+
+| | ESLint | oxlint |
+| --- | --- | --- |
+| speed | slow | fast (Rust, parallelized) |
+| custom rules | full `no-restricted-syntax` AST selectors + JS plugins | fixed built-in rule set only |
+| type-aware | heavy (`@typescript-eslint`) | native (`effecttsgo`) |
+
+- **ESLint** enforces the app's custom architecture bans oxlint cannot express (in `eslint.config.mjs`
+  via `no-restricted-syntax`): raw `throw`, **all** `.flatMap()`, `Context.Tag()` / `GenericTag()`,
+  `Effect.fail(new Error(...))`.
+- **oxlint** enforces type-aware `effecttsgo` rules ESLint doesn't have: `flat-map-to-map`,
+  `global-console`, `outdated-api`, `any-unknown-in-error-context`, …
+
+### v4 API renames caught by oxlint
+
+- `Effect.catchAll` was **removed** in v4 — use `Effect.tapError` to observe+log while keeping the
+  failure, or `Effect.catchCause` to recover. (`Effect.catch` doesn't exist in `4.0.0-beta.107` either.)
+- `console.error(...)` → `Effect.logError(...)`.
+
+### Verify
+
+```powershell
+bunx oxlint --version       # expect 1.77.0
+bun run lint:oxlint         # expect exit 0
+```
+
+Known limitation: `effecttsgo` rules require oxlint's **type-aware mode**, which the tsgo patch +
+`recommended` preset enable. (This project runs `effect-tsgo patch --typescript --oxlint`, so
+TypeScript is patched too — the doc's `--no-typescript --oxlint` variant is available if you only
+want oxlint.)
+
+---
+
 ## Gotchas
 
 - After `package.json` changes, `bun install` re-runs `prepare` (`effect-tsgo patch`). The stderr note "typescript skipped..." is normal (PowerShell may show an exit-1 wrapper — ignore it).
 - Don't run `TypeScriptTeam.native-preview` AND another tsgo provider in parallel — Effect docs say use `effect-tsgo` as your **sole** language server.
 - `.bin/tsc` resolves through `node_modules/typescript` (which is patched to native), so `npx tsc` stays TS7 even though the `typescript` package itself is TS6.
-- `effect-tsgo patch --oxlint` is optional (Oxlint is a separate fast linter for CI; not needed for editor codegen). Keep `--no-oxlint`.
+- `effect-tsgo patch --oxlint` is optional for editor codegen but **enabled in this repo** for CI/fast
+  linting — see "Oxlint + Effect tsgo" above. oxlint's version must match `@effect/tsgo`; don't run
+  `bun add oxlint` bare.

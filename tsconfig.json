@@ -22,10 +22,12 @@
       },
       {
         "name": "@effect/language-service",
+        "diagnostics": false,
         "allowedDuplicatedPackages": [
           "effect",
           "@effect/platform-bun",
-          "@effect/platform-node-shared"
+          "@effect/platform-node-shared",
+          "@effect/sql-libsql"
         ]
       }
     ],
@@ -41,5 +43,8 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "repos"
+  ]
 }

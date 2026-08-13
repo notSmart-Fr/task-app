@@ -1,40 +1,26 @@
-import { HttpApiSchema } from "@effect/platform";
-import{Schema} from "effect";
-// task entity schema
-export class TaskSchema extends Schema.Class<TaskSchema>("TaskSchema")({
-  id: Schema.String,
+import { Schema } from "effect"
+
+// Task entity (row) schema
+export class Task extends Schema.Class<Task>("Task")({
+  id: Schema.Finite,
   title: Schema.String,
-  completed: Schema.Boolean,
+  done: Schema.Boolean
 }) {}
 
-export const TaskListSchema = Schema.Array(TaskSchema);
-
-//req payload
-export class CreateTaskPayloadSchema extends Schema.Class<CreateTaskPayloadSchema>("CreateTaskPayloadSchema")({
+// Request payload schemas
+export class CreateTask extends Schema.Class<CreateTask>("CreateTask")({
   title: Schema.String,
-  completed: Schema.Boolean,
+  done: Schema.optional(Schema.Boolean)
 }) {}
 
-export class UpdateTaskPayloadSchema extends Schema.Class<UpdateTaskPayloadSchema>("UpdateTaskPayloadSchema")({
+export class UpdateTask extends Schema.Class<UpdateTask>("UpdateTask")({
   title: Schema.optional(Schema.String),
-  completed: Schema.optional(Schema.Boolean),
+  done: Schema.optional(Schema.Boolean)
 }) {}
 
-// Tagged errors (mapped to HTTP status codes)
-export class TaskNotFoundError extends Schema.TaggedError<TaskNotFoundError>()(
-  "TaskNotFoundError",
-  { error: Schema.String },
-  HttpApiSchema.annotations({ status: 404 }) // 404 Not Found
-) {}
-
-export class TaskAlreadyExistsError extends Schema.TaggedError<TaskAlreadyExistsError>()(
-  "TaskAlreadyExistsError",
-  { error: Schema.String },
-  HttpApiSchema.annotations({ status: 409 }) // 409 Conflict
-) {}
-
-export class ValidationError extends Schema.TaggedError<ValidationError>()(
-  "ValidationError",
-  { error: Schema.String },
-  HttpApiSchema.annotations({ status: 400 }) // 400 Bad Request
-) {}
+// Tagged domain error, annotated so HttpApi encodes it as a 404
+export class TaskNotFound extends Schema.TaggedError<TaskNotFound>()("TaskNotFound", {
+  id: Schema.Finite
+}, {
+  httpApiStatus: 404
+}) {}

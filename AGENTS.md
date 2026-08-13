@@ -38,21 +38,24 @@ This workspace is a mixed project: a Next.js app plus vendored reference code un
 
 When building a new feature in this stack, prefer a vertical-slice structure that keeps feature-specific code together while leaving shared infrastructure in shared folders.
 
-Recommended pattern for Next.js + Effect + Drizzle:
+Recommended pattern for Next.js + Effect + Effect SQL (no ORM):
 
 - src/lib/db/: shared persistence infrastructure
-  - index.ts: database client and ORM setup
-  - schema.ts: shared Drizzle table definitions
+  - migrations.ts: inline Effect SQL migrations (Migrator.fromRecord)
+  - client.ts: DbLive layer (LibsqlClient.layer + migrations)
+  - migrate.ts: standalone migration runner (`bun run src/lib/db/migrate.ts`)
 - src/features/<feature>/: feature-owned code
   - index.ts: public barrel for the feature
   - schema.ts: request/response schemas and typed errors
   - routes.ts: HttpApi route contract definitions
-  - handlers.ts: transport-to-effect adapters
-  - service.ts: business logic and database access
+  - handlers.ts: HttpApiBuilder.group handler layer
+  - service.ts: business logic and SQL access (Context.Service + SqlClient)
   - components/: feature UI components
 - src/api/: system-level API composition
-  - routes.ts or index.ts: compose feature route groups into a root API
+  - index.ts: compose feature route groups into a root HttpApi
 - src/app/api/[[...route]]/route.ts: adapter layer that turns HTTP requests into Effect handlers
+
+See agent-patterns/effect-core.md section 8 for the full verified vertical slice.
 
 Use this structure as a default for new features unless the task clearly calls for a different shape. Keep the feature slice focused on feature-specific concerns and avoid mixing shared infrastructure or app-wide concerns into it.
 

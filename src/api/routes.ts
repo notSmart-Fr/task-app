@@ -1,17 +1,12 @@
 // src/api/routes.ts
-import { HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
-import { HealthResponse, RootInfoResponse } from "./schema";
+import { HttpApiEndpoint, HttpApiGroup } from "effect/unstable/httpapi"
+import { HealthResponse, RootInfoResponse } from "./schema"
 
 export class SystemGroup extends HttpApiGroup.make("api")
   .add(
-    HttpApiEndpoint.get("health", "/health") // Full path: /api/health
-      .addSuccess(HealthResponse)
+    HttpApiEndpoint.get("health", "/health", { success: HealthResponse }),
+    HttpApiEndpoint.get("info", "/info", { success: RootInfoResponse })
   )
-  .add(
-    HttpApiEndpoint.get("info", "/info") // Full path: /api/info
-      .addSuccess(RootInfoResponse)
-  )
-  // Prefix must come AFTER .add() — in this version it only rewrites endpoints
-  // already present on the group. Mounted under the Next.js /api/[[...route]]
-  // route handler.
+  // Prefix must come AFTER .add() — it only rewrites endpoints already on the
+  // group. Mounted under the Next.js /api/[[...route]] route handler.
   .prefix("/api") {}
