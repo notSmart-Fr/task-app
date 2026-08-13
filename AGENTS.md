@@ -22,11 +22,12 @@ This workspace is a mixed project: a Next.js app plus vendored reference code un
 - The folders under repos/ are reference material only.
 - Do not edit files inside repos/ unless the user explicitly instructs you to do so.
 - Do not import from repos/ paths such as repos/effect. Import from published packages such as effect instead.
-- When working with Effect-related code, inspect repos/effect first for idiomatic patterns, tests, and API usage.
+- When working with Effect-related code, use the local guide under `.knowledge/agent-patterns/` first (see section 4); fall back to `repos/effect` for idiomatic patterns, tests, and API usage when the local notes don't have the answer.
 
 ## 4. Use the local Effect reference before implementing Effect code
 
-- Before implementing or modifying Effect code, read agent-patterns/effect-core.md.
+- Before implementing or modifying Effect code, read `.knowledge/agent-patterns/effect-core.md` first.
+- If the local guide does not answer the question, then refer to the vendored `repos/` code (e.g. `repos/effect`) for idiomatic patterns, tests, and API usage.
 - That file is the local, repo-specific guide for:
   - Schema.Class and Schema.TaggedError
   - Effect.fail, catchTag, and catchTags
@@ -55,7 +56,7 @@ Recommended pattern for Next.js + Effect + Effect SQL (no ORM):
   - index.ts: compose feature route groups into a root HttpApi
 - src/app/api/[[...route]]/route.ts: adapter layer that turns HTTP requests into Effect handlers
 
-See agent-patterns/effect-core.md section 8 for the full verified vertical slice.
+See `.knowledge/agent-patterns/effect-core.md` section 8 for the full verified vertical slice.
 
 Use this structure as a default for new features unless the task clearly calls for a different shape. Keep the feature slice focused on feature-specific concerns and avoid mixing shared infrastructure or app-wide concerns into it.
 
@@ -75,6 +76,12 @@ Use this structure as a default for new features unless the task clearly calls f
 - Be efficient, not careless.
 - Prefer simple solutions over clever ones.
 - Handle errors and validation properly, especially at trust boundaries.
+
+## 8. Keep project knowledge in .knowledge
+
+- Do not keep notes in workspaceStorage or the assistant's out-of-repo memory store.
+- Always write project patterns, gotchas, and decisions directly into `.knowledge/` as real, committed files.
+- Consult `.knowledge/` (local) before the vendored `repos/` reference code.
 
 This block is written and re-added by next dev. Keep it intact unless you are explicitly asked to rewrite the project instructions.
 <!-- END:nextjs-agent-rules -->

@@ -1,4 +1,4 @@
-# Effect core patterns for this repository
+# Effect e2e patterns for this repository
 
 This note captures the idiomatic patterns used in the vendored Effect codebase for schema modeling, typed errors, generators, and HttpApi definitions.
 
