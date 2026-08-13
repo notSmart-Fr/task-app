@@ -605,6 +605,24 @@ Notes:
 - Handlers cannot fail with undeclared errors — convert infrastructure failures (`SqlError`) with `Effect.orDie` and keep only declared domain errors.
 - Global error handling: the router already turns missing routes into 404 and defects into 500 (and logs the cause) but with empty bodies. To return JSON bodies, use `HttpRouter.toHttpEffect` + `Effect.catchCause` before `HttpEffect.toWebHandler` (see 8.6). Note `Effect.catchAllCause` is renamed `Effect.catchCause` in v4.
 
+## 9. Time: use Clock, not Date.now / new Date
+
+Read the current time from the `Clock` service so it stays testable, never from
+`Date.now` or `new Date()`.
+
+```ts
+import { Clock, Effect } from "effect"
+
+const program = Effect.gen(function*() {
+  const nowMillis = yield* Clock.currentTimeMillis
+  // ...
+})
+```
+
+- `Clock.currentTimeMillis` — epoch millis (`Effect<number>`).
+- `Clock.currentTimeNanos` — higher-precision nanos (`Effect<bigint>`).
+- In tests, control time deterministically with `TestClock` instead of mocking `Date`.
+
 ## Summary
 
 The short version is:
@@ -615,4 +633,4 @@ The short version is:
 - Keep dependencies explicit with `Context.Service` + `Layer`.
 - Define HTTP contracts with `HttpApiGroup` / `HttpApiEndpoint` (object-form options) and implement them with `HttpApiBuilder.group`.
 - Do persistence with the generic `SqlClient` (tagged-template queries), provided by a driver layer such as `LibsqlClient.layer`.
-- Wire it all into Next.js with `HttpApiBuilder.layer` + `HttpRouter.toWebHandler` in `src/app/api/[[...route]]/route.ts`.
+- Wire it all into Next.js with `HttpApiBuilder.layer` + `HttpRouter.toHttpEffect` + `Effect.catchCause` + `HttpEffect.toWebHandler` in `src/app/api/[[...route]]/route.ts`.
